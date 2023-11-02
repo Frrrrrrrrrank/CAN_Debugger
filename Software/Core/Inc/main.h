@@ -65,8 +65,6 @@ void Error_Handler(void);
 #define V_SENSE_GPIO_Port GPIOC
 #define BTN1_Pin GPIO_PIN_15
 #define BTN1_GPIO_Port GPIOB
-#define BUZZER_Pin GPIO_PIN_6
-#define BUZZER_GPIO_Port GPIOC
 #define OLED_RST_Pin GPIO_PIN_10
 #define OLED_RST_GPIO_Port GPIOC
 #define OLED_DC_Pin GPIO_PIN_11
