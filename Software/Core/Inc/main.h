@@ -61,8 +61,8 @@ void Error_Handler(void);
 #define CAN_STB_GPIO_Port GPIOC
 #define I_AMPLIFIED_SENSE_Pin GPIO_PIN_0
 #define I_AMPLIFIED_SENSE_GPIO_Port GPIOA
-#define V_SENSE_Pin GPIO_PIN_4
-#define V_SENSE_GPIO_Port GPIOC
+#define V_BUFFERED_SENSE_Pin GPIO_PIN_4
+#define V_BUFFERED_SENSE_GPIO_Port GPIOC
 #define BTN1_Pin GPIO_PIN_15
 #define BTN1_GPIO_Port GPIOB
 #define OLED_RST_Pin GPIO_PIN_10
