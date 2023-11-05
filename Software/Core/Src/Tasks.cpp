@@ -18,21 +18,25 @@ namespace Tasks {
 
 
     void init() {
-        Buzzer::playBlocked(0.1, 220, 1000);
+        Buzzer::playBlocked(0.1, 220, 500);
         HAL_ADC_Start_DMA(&hadc2, (uint32_t *) &adc_buffer, 8);
         HAL_TIM_Base_Start_IT(&htim3);
     }
 
 }
 
-volatile uint32_t avg = 0;
+volatile uint32_t avgV = 0;
+volatile uint32_t avgA = 0;
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-    int buf = 0;
-    for (unsigned short i: Tasks::adc_buffer) {
-        buf += i;
+    int bufV = 0;
+    int bufA = 0;
+    for (size_t i = 0; i < 4; i++) {
+        bufV += Tasks::adc_buffer[2 * i];
+        bufA += Tasks::adc_buffer[2 * i + 1];
     }
-    avg = buf / 8;
+    avgV = bufV / 4;
+    avgA = bufA / 4;
 }
 
 extern "C" {
