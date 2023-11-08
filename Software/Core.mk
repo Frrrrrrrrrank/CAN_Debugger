@@ -2,8 +2,8 @@
 # Core.mk
 #
 # @authors:
-#			-JIANG Yicheng (RM2024)
-#			-Zou Hetai (RM2024)
+#			-JIANG Yicheng (RM2023)
+#			-Zou Hetai (RM2023)
 #
 # RM2023 Generic Makefile (based on gcc)
 # ------------------------------------------------
@@ -17,13 +17,13 @@ PREFIX = arm-none-eabi-
 ifdef GCC_PATH
 CC = $(GCC_PATH)/$(PREFIX)gcc							# c compiler
 CPPC = $(GCC_PATH)/$(PREFIX)g++							# CPP compiler
-AS = $(GCC_PATH)/$(PREFIX)gcc -x assembler-with-cpp		# assembler
+AS = $(GCC_PATH)/$(PREFIX)g++ -x assembler-with-cpp		# assembler
 CP = $(GCC_PATH)/$(PREFIX)objcopy
 SZ = $(GCC_PATH)/$(PREFIX)size
 else
 CC = $(PREFIX)gcc										# c compiler
 CPPC = $(PREFIX)g++										# CPP compiler
-AS = $(PREFIX)gcc -x assembler-with-cpp					# assembler
+AS = $(PREFIX)g++ -x assembler-with-cpp					# assembler
 CP = $(PREFIX)objcopy
 SZ = $(PREFIX)size
 endif
@@ -45,6 +45,7 @@ FLOAT-ABI = -mfloat-abi=hard
 
 # mcu
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
+
 
 # compile flags
 COMPILERFLAGS = $(MCU)								# MCU
@@ -112,16 +113,14 @@ else
 Q:=@
 endif
 
-
-#######################################
-
 BUILD_SUCCESS = @echo -e "\033[2K\033[92mBuild success!\033[m\n"
 
 ifndef ECHO
 HIT_TOTAL != ${MAKE} ${MAKECMDGOALS} --dry-run ECHO="HIT_MARK" | grep -c "HIT_MARK"
 HIT_COUNT = $(eval HIT_N != expr ${HIT_N} + 1)${HIT_N}
-ECHO = @echo -e "\033[2K\033[96;49;4m[`expr ${HIT_COUNT} '*' 100 / ${HIT_TOTAL}`%]\033[m\033[93m$(notdir $<)\033[m\r\c"
+ECHO = @echo -e "\033[2K\033[96;49;4m[`expr ${HIT_COUNT} '*' 100 / ${HIT_TOTAL}`%]Building:\033[m$(notdir $<)\r\c"
 endif
+# $(info $(HIT_TOTAL) $(HIT_COUNT) $(ECHO))
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
@@ -137,8 +136,8 @@ OBJECTS = $(addprefix $(BUILD_DIR)/,$(C_SOURCES:.c=.o))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(CPP_SOURCES:.cpp=.o))
 vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(O_SRC)))
-vpath %.o $(sort $(dir $(O_SRC)))
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(CPP_COMPILED))
+vpath %.s $(sort $(dir $(CPP_COMPILED)))
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(ASM_SOURCES:.s=.o))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
@@ -150,7 +149,7 @@ $(info )
 $(info C sources: $(C_SOURCES))
 $(info CPP sources: $(CPP_SOURCES))
 $(info ASM sources: $(ASM_SOURCES))
-$(info O sources: $(O_SRC))
+$(info )
 
 # Build .c files
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
@@ -197,11 +196,13 @@ $(BUILD_DIR):
 
 # Clean up
 clean:
-	@echo -e "\033[2K\033[96mClean up...\033[m"
+	@echo -e "\033[2K\033[96mCleaning up...\033[m"
 	@-rm -fR $(BUILD_DIR)
 
 # Rebuild
-rebuild: clean all
+rebuild:
+	$(Q)$(MAKE) -s clean
+	$(Q)$(MAKE) -s all
 
 # Show size
 size: $(BUILD_DIR)/$(TARGET).elf
